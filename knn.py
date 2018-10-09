@@ -11,7 +11,7 @@ from matplotlib import pyplot as plt
 
 from data import make_dataset1, make_dataset2
 from sklearn.neighbors import KNeighborsClassifier
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import accuracy_score
 
 # (Question 2)
@@ -56,3 +56,29 @@ if __name__ == "__main__":
     for label, i in zip(labels,range(6)):
         print("{:>10} \t {:.3f}".format(label,accuracy_arr[i]))
 
+
+
+    #Cross-validation testing
+
+    # Taking neighbours as multiples of 5
+    k_list = list(range(5,625,5))
+    cv_results = []
+
+    # perform 10-fold cross validation
+    for k in k_list:
+        knn = KNeighborsClassifier(n_neighbors=k)
+        scores = cross_val_score(knn, X_ls, y_ls, cv=10, scoring='accuracy')
+        cv_results.append(scores.mean()) #Taking the mean of the 10 tries
+
+    # changing to misclassification error
+    MSE = [1 - x for x in cv_results]
+
+    # determining best k
+    optimal_k = k_list[MSE.index(min(MSE))]
+    print("The optimal number of neighbors is {}".format(optimal_k))
+
+    # plot misclassification error vs k
+    plt.plot(k_list, MSE)
+    plt.xlabel('Number of Neighbors K')
+    plt.ylabel('Misclassification Error')
+    plt.show()
