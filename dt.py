@@ -13,6 +13,7 @@ from data import make_dataset1, make_dataset2
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
+from plot import plot_boundary
 # (Question 1)
 
 # Put your funtions here
@@ -56,3 +57,4 @@ if __name__ == "__main__":
 
     for label, i in zip(labels,range(5)):
         print("{:>10} \t {:.3f} \t {:.4f}".format(label,accuracy_arr[i].mean(),accuracy_arr[i].std()))
+        plot_boundary(label,estimators[i], X_ts, y_ts,0.1,"DT classifiers maxdepth {}".format(label))
