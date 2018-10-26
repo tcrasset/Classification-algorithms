@@ -13,6 +13,7 @@ from data import make_dataset1, make_dataset2
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import train_test_split, cross_val_score
 from sklearn.metrics import accuracy_score
+from plot import plot_boundary
 
 # (Question 2)
 
@@ -55,6 +56,8 @@ if __name__ == "__main__":
 
     for label, i in zip(labels,range(6)):
         print("{:>10} \t {:.3f}".format(label,accuracy_arr[i]))
+        plot_boundary("KNN neighbors {}".format(label),estimators[i], X_ts, y_ts,0.1)
+
 
 
 
