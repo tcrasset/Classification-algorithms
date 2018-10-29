@@ -20,58 +20,53 @@ from plot import plot_boundary
 # Put your funtions here
 # ...
 
+def trainEstimator(nbGen, neighbors):
+    for generation in range(nbGen):
+        nbPoints = 1500
+        seed = generation
+        X, y = make_dataset2(nbPoints, seed)
+        accuracy_arr = np.zeros(nbGen)
 
-if __name__ == "__main__":
-    nbPoints = 1500
-    seed = 666
-    X, y = make_dataset2(nbPoints, seed)
-    
-    X_ls, X_ts, y_ls, y_ts = train_test_split(X, y , train_size = 1200/1500)
+        X_ls, X_ts, y_ls, y_ts = train_test_split(X, y, train_size = 1200, test_size = 300)
 
-    estimator_n_neighbors_1 = KNeighborsClassifier(n_neighbors = 1).fit(X_ls,y_ls)
-    estimator_n_neighbors_5 = KNeighborsClassifier(n_neighbors = 5).fit(X_ls,y_ls)
-    estimator_n_neighbors_25 = KNeighborsClassifier(n_neighbors = 25).fit(X_ls,y_ls)
-    estimator_n_neighbors_125 = KNeighborsClassifier(n_neighbors= 125).fit(X_ls,y_ls)
-    estimator_n_neighbors_625 = KNeighborsClassifier(n_neighbors= 625).fit(X_ls,y_ls)
-    estimator_n_neighbors_1200 = KNeighborsClassifier(n_neighbors= 1200).fit(X_ls,y_ls)
+        estimator = KNeighborsClassifier(n_neighbors = neighbors).fit(X_ls,y_ls)
 
-
-    estimators = [
-        estimator_n_neighbors_1,
-        estimator_n_neighbors_5,
-        estimator_n_neighbors_25,
-        estimator_n_neighbors_125,
-        estimator_n_neighbors_625,
-        estimator_n_neighbors_1200
-    ]
-
-    accuracy_arr = np.empty((6))
-
-    for estimator, j in zip(estimators,range(6)):
         y_pred = estimator.predict(X_ts)
-        accuracy_arr[j] = accuracy_score(y_ts, y_pred)
-    
-    labels = [1,5,25,125,625,1200]
-    print("N_neighbors \t Accuracy score")
 
-    for label, i in zip(labels,range(6)):
-        print("{:>10} \t {:.3f}".format(label,accuracy_arr[i]))
-        plot_boundary("KNN neighbors {}".format(label),estimators[i], X_ts, y_ts,0.1)
+        if generation == 1:
+            plot_boundary("KNN neighbors {}".format(neighbors),estimator , X_ts, y_ts, 0.1)
+        
+        accuracy_arr[generation] = accuracy_score(y_ts, y_pred)
+    return accuracy_arr
 
 
-
-
-    #Cross-validation testing
-
-    # Taking neighbours as multiples of 5
-    k_list = list(range(5,625,5))
+def crossval(k_list, cv_val):
+    nbPoints = 1500
+    seed = cv_val
     cv_results = []
+
+    X, y = make_dataset2(nbPoints, seed)
 
     # perform 10-fold cross validation
     for k in k_list:
         knn = KNeighborsClassifier(n_neighbors=k)
-        scores = cross_val_score(knn, X_ls, y_ls, cv=10, scoring='accuracy')
-        cv_results.append(scores.mean()) #Taking the mean of the 10 tries
+        scores = cross_val_score(knn, X, y, cv=cv_val, scoring='accuracy')
+        cv_results.append(scores.mean()) #Taking the mean of the cv_val tries
+
+    return cv_results
+
+if __name__ == "__main__":
+    nbGen = 5
+    neighbors = [1,5,25,125,625,1200]
+    
+    
+    for neighbor in neighbors:
+        print("N_neighbors depth : {}".format(neighbor))
+        print("Mean \t STD")
+        accuracy = trainEstimator(5, neighbor)
+        print("{:.3f} \t {:.4f}".format(accuracy.mean(), accuracy.std()))
+
+    cv_results = crossval(neighbors, 10) # Cross-validation testing
 
     # changing to misclassification error
     MSE = [1 - x for x in cv_results]
@@ -85,3 +80,4 @@ if __name__ == "__main__":
     plt.xlabel('Number of Neighbors K')
     plt.ylabel('Misclassification Error')
     plt.show()
+
