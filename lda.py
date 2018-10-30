@@ -68,7 +68,6 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
         #               }
         dictionary = {}
 
-
         #Separating the points into their class
         for _X, _y in zip(X,y):
             if _y in dictionary:
@@ -98,8 +97,16 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
         return self
 
     def _classDensityFunction(self, x, mu_k):
-        """ 
-        Computes the class density function
+        """Computes the class density function.
+
+        Parameters
+        ----------
+        -   x : feature vector.
+        -   mu_k : mean matrix corresponding to class k.
+
+        Returns
+        -------
+        The class density function of vector feature x.
         """
         constant = 1/(2*math.pi**(x.shape[0]/2)*np.sqrt(np.linalg.det(self.Sigma_)))
         xnorm = x - mu_k
@@ -107,9 +114,17 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
         return constant*exposant
 
     def _probpost(self, x, k):
-        """ 
-        Computes the probability a posteriori of x belonging
-        to class k
+        """Computes the probability a posteriori for a feature vector to belong
+        to a certain class.
+
+        Parameters
+        ----------
+        -   x : feature vector.
+        -   k : class.
+
+        Returns
+        -------
+        The probability a posteriori of x belonging to class k.
         """
         summation = 0
         for key in self.mu_.keys():
@@ -166,20 +181,34 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
 
         return np.array(p).reshape((X.shape[0],len(classes)))
 
+def compute_accuracy(nbPoints, nbGen):
+    """Computes the test set accurencies over n generations of the dataset
+    for the KNeighborsClassifier class from sklearn.neighbors with a
+    particular number of nearest neighbors.
 
+        Parameters
+        ----------
+        -   nb_gen : number of generations of the dataset.
+        -   nb_neighbors : number of nearest neighbors for the KNN model.
+        -   nb_points : number of samples.
 
-
-def trainEstimator(nbPoints, nbGen):
+        Returns
+        -------
+        accuracy : a list of the test set accuracies of the different
+        generations.
+    """
+    accuracy = []
 
     for gen in range(nbGen):
-        seed = gen
 
-        X, y = make_dataset1(nbPoints, seed)
-        X_ls, X_ts, y_ls, y_ts = train_test_split(X, y, train_size = 0.8, test_size = 0.2)
+        X, y = make_dataset1(nbPoints, gen)
+        X_ls, X_ts, y_ls, y_ts = train_test_split(X, y, train_size = 0.8)
 
         estimator = LinearDiscriminantAnalysis().fit(X_ls, y_ls)
         y_pred = estimator.predict(X_ts)
+
         #TODO: LinearDiscriminantAnalysis.score()
+
     return y_pred
 
 
@@ -190,5 +219,6 @@ if __name__ == "__main__":
 
     nbPoints = 1500
     nbGen = 5
-    y_pred = trainEstimator(nbPoints, nbGen)
+
+    y_pred = compute_accuracy(nbPoints, nbGen)
     print(y_pred)
