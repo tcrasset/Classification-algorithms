@@ -158,22 +158,37 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
             The class probabilities of the input samples. Classes are ordered
             by lexicographic order.
         """
-
-        #Computing probability a posteriori of X belonging to a certain class
         classes = sorted(self.classes_)
         p = []
         for x in X:
             for k in classes:
                 p.append(self._probpost(x, k))
 
-        p = np.array(p).reshape((X.shape[0],len(classes)))
-        return p
+        return np.array(p).reshape((X.shape[0],len(classes)))
+
+
+
+
+def trainEstimator(nbPoints, nbGen):
+
+    for gen in range(nbGen):
+        seed = gen
+
+        X, y = make_dataset1(nbPoints, seed)
+        X_ls, X_ts, y_ls, y_ts = train_test_split(X, y, train_size = 0.8, test_size = 0.2)
+
+        estimator = LinearDiscriminantAnalysis().fit(X_ls, y_ls)
+        y_pred = estimator.predict(X_ts)
+        #TODO: LinearDiscriminantAnalysis.score()
+    return y_pred
+
 
 if __name__ == "__main__":
     from data import make_dataset1
     from plot import plot_boundary
-    X, y = make_dataset1(1500,666)
-    estimator = LinearDiscriminantAnalysis().fit(X, y)
+    from sklearn.model_selection import train_test_split
 
-    y_pred = estimator.predict(X)
-    print(y)
+    nbPoints = 1500
+    nbGen = 5
+    y_pred = trainEstimator(nbPoints, nbGen)
+    print(y_pred)
