@@ -35,7 +35,7 @@ def compute_accuracy(nb_gen, max_depth):
     for generation in range(nb_gen):
         seed = generation
         X, y = make_dataset2(nb_points, seed)
-        X_ls, X_ts, y_ls, y_ts = train_test_split(X, y, train_size=.8)
+        X_ls, X_ts, y_ls, y_ts = train_test_split(X, y, train_size=.8, test_size=.2)
         
         if max_depth == "None":
             estimator = DecisionTreeClassifier().fit(X_ls, y_ls)

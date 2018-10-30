@@ -60,7 +60,7 @@ if __name__ == "__main__":
     
     
     for neighbor in neighbors:
-        print("N_neighbors depth : {}".format(neighbor))
+        print("N_neighbors : {}".format(neighbor))
         print("Mean \t STD")
         accuracy = np.array(trainEstimator(nbGen, neighbor))
         print("{:.3f} \t {:.4f}".format(accuracy.mean(), accuracy.std()))
