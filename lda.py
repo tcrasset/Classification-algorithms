@@ -40,6 +40,11 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
         if y.shape[0] != X.shape[0]:
             raise ValueError("The number of samples differs between X and y")
 
+        pi = []
+        mu = []
+        X_norm = []
+        Sigma = None
+        dictionary = {}
         # Stores for each class k a tuple 
         # (nb_occurance of class k, sum of attributes of all samples belonging to k)
         # dictionnary[k][0] =  nb_occurance
@@ -49,14 +54,23 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
         for _X, _y in zip(X,y):
             if _y in dictionary:
                 dictionary[_y][0] += 1
-                dictionary[_y][1] = np.add(dictionary[_y][1],_X)
+                dictionary[_y][1].append(_X)
             else:
-                dictionary[_y][0] == 1
-                dictionary[_y][1] = np.array(_X)
+                dictionary[_y] = [1, [_X] ]
 
         for key, value in zip(dictionary.keys(), dictionary.values()):
-            pi = np.append(key, value[0]/y.shape[0]) # Probability of belonging to class
-            mu = np.append(key, value[1]/value[0]) # Mean of all attributes
+            attributes_array = np.array(value[1])
+            mu.append([key, np.mean(attributes_array,axis=0)]) # Elementwise mean of attributes per class
+            pi.append([key, value[0]/y.shape[0]]) # Probability of belonging to class
+            #Normalize attributes with the mean of their class
+            X_norm.append(attributes_array - mu[-1][1])
+
+        #Concatenatinng all the points into one array again
+        X_norm[1] = np.array(X_norm[1])
+        X_norm[0] = np.array(X_norm[0])
+        X_norm = np.concatenate((X_norm[0], X_norm[1]), axis=0)
+
+        Sigma = np.cov(X_norm, rowvar=False)
 
         return self
 
