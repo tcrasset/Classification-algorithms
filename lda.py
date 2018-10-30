@@ -106,12 +106,12 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
 
         Returns
         -------
-        The class density function of vector feature x.
+        The class density function of feature vector x.
         """
         constant = 1/(2*math.pi**(x.shape[0]/2)*np.sqrt(np.linalg.det(self.Sigma_)))
         xnorm = x - mu_k
-        exposant = math.exp(-0.5 * np.transpose(xnorm)@np.linalg.inv(self.Sigma_)@xnorm)
-        return constant*exposant
+        power = math.exp(-0.5 * np.transpose(xnorm)@np.linalg.inv(self.Sigma_)@xnorm)
+        return constant*power
 
     def _probpost(self, x, k):
         """Computes the probability a posteriori for a feature vector to belong
@@ -182,20 +182,17 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
         return np.array(p).reshape((X.shape[0],len(classes)))
 
 def compute_accuracy(nbPoints, nbGen):
-    """Computes the test set accurencies over n generations of the dataset
-    for the KNeighborsClassifier class from sklearn.neighbors with a
-    particular number of nearest neighbors.
+    """Computes the test set accuracies over nbGen generations of the dataset
+        using a LinearDiscriminantAnalysis() as a classifier
 
         Parameters
         ----------
-        -   nb_gen : number of generations of the dataset.
-        -   nb_neighbors : number of nearest neighbors for the KNN model.
-        -   nb_points : number of samples.
+        -   nbPoints : number of samples.
+        -   nbGen : number of generations of the dataset.
 
         Returns
         -------
-        accuracy : a list of the test set accuracies of the different
-        generations.
+        accuracy : accuracies mean over ngGen generations
     """
     accuracy = []
 
@@ -205,7 +202,7 @@ def compute_accuracy(nbPoints, nbGen):
         X_ls, X_ts, y_ls, y_ts = train_test_split(X, y, train_size = 0.8, test_size=0.2)
 
         estimator = LinearDiscriminantAnalysis().fit(X_ls, y_ls)
-        accuracy.append(estimator.score(X, y))
+        accuracy.append(estimator.score(X_ts, y_ts))
 
     return np.array(accuracy).mean()
 

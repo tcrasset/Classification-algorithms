@@ -46,7 +46,7 @@ def compute_accuracy(nb_gen, nb_neighbors, nb_points):
         if generation == 1:
             plot_boundary("KNN neighbors {}".format(nb_neighbors), estimator, X_ts, y_ts, 0.1)
         
-    return accuracy
+    return np.array(accuracy)
 
 def compute_cross_val(cv_val, neighbors, nb_points):
     """Computes the optimal value of n_neighbors using a ten-fold cross
@@ -90,7 +90,7 @@ if __name__ == "__main__":
     for nb_neighbors in neighbors:
         print("N_neighbors : {}".format(nb_neighbors))
         print("Mean \t STD")
-        accuracy = np.array(compute_accuracy(nb_gen, nb_neighbors, nb_points))
+        accuracy = compute_accuracy(nb_gen, nb_neighbors, nb_points)
         print("{:.3f} \t {:.4f}".format(accuracy.mean(), accuracy.std()))
 
     # Cross-validation testing

@@ -49,7 +49,7 @@ def compute_accuracy(nb_gen, max_depth, nb_points):
         if generation == 1:
             plot_boundary("DT max_depth {}".format(max_depth), estimator, X_ts, y_ts, 0.1)
 
-    return accuracy
+    return np.array(accuracy)
 
 if __name__ == "__main__":
     nb_gen = 5
@@ -59,5 +59,5 @@ if __name__ == "__main__":
     for max_depth in max_depths:
         print("Maximal depth : {}".format(max_depth))
         print("Mean \t STD")
-        accuracy = np.array(compute_accuracy(nb_gen, max_depth, nb_points))
+        accuracy = compute_accuracy(nb_gen, max_depth, nb_points)
         print("{:.3f} \t {:.4f}".format(accuracy.mean(), accuracy.std()))
