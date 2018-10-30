@@ -202,14 +202,12 @@ def compute_accuracy(nbPoints, nbGen):
     for gen in range(nbGen):
 
         X, y = make_dataset1(nbPoints, gen)
-        X_ls, X_ts, y_ls, y_ts = train_test_split(X, y, train_size = 0.8)
+        X_ls, X_ts, y_ls, y_ts = train_test_split(X, y, train_size = 0.8, test_size=0.2)
 
         estimator = LinearDiscriminantAnalysis().fit(X_ls, y_ls)
-        y_pred = estimator.predict(X_ts)
+        accuracy.append(estimator.score(X, y))
 
-        #TODO: LinearDiscriminantAnalysis.score()
-
-    return y_pred
+    return np.array(accuracy).mean()
 
 
 if __name__ == "__main__":
@@ -220,5 +218,5 @@ if __name__ == "__main__":
     nbPoints = 1500
     nbGen = 5
 
-    y_pred = compute_accuracy(nbPoints, nbGen)
-    print(y_pred)
+    accuracy = compute_accuracy(nbPoints, nbGen)
+    print(accuracy)
