@@ -57,14 +57,17 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
         #      }
         mu = {}
 
-        X_norm = []
-        Sigma = None
-
         # Stores for each class k a tuple 
         # (nb_occurance of class k, list of all samples belonging to k)
-        # dictionnary[k][0] =  nb_occurance
-        # dictionnary[k][1] =  list of all samples belonging to k
+        # Shape :
+        # dictionnary = {class1 : (nb_occurance, list of samples),
+        #                class2 : (nb_occurance, list of samples),
+        #                ...
+        #               }
         dictionary = {}
+
+        X_normlist = []
+        Sigma = None
 
         #Separating the points into their class
         for _X, _y in zip(X,y):
@@ -80,12 +83,10 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
             mu[key] = np.mean(attributes_array,axis=0) # Elementwise mean of attributes per class
             pi[key] = value[0]/y.shape[0] # Probability of belonging to class
             #Normalize attributes with the mean of their class
-            X_norm.append(attributes_array - mu[key])
+            X_normlist.append(attributes_array - mu[key])
 
         #Concatenating all the points into one array again
-        X_norm[0] = np.array(X_norm[0])
-        X_norm[1] = np.array(X_norm[1])
-        X_norm = np.concatenate((X_norm[0], X_norm[1]), axis=0)
+        X_norm = np.concatenate([xnorm for xnorm in X_normlist], axis=0) 
 
         #Covariance matrix
         Sigma = np.cov(X_norm, rowvar=False)
