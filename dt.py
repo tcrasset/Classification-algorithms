@@ -21,16 +21,16 @@ def compute_accuracy(nb_gen, max_depth, nb_points):
     using the DecisionTreeClassifier class from sklearn.tree with a
     particular max depth.
 
-        Parameters
-        ----------
-        -   nb_gen : number of generations of the dataset.
-        -   max_depth : maximum depth of the decision tree for the DT model.
-        -   nb_points : number of samples.
+    Parameters
+    ----------
+    -   nb_gen : number of generations of the dataset.
+    -   max_depth : maximum depth of the decision tree for the DT model.
+    -   nb_points : number of samples.
 
-        Returns
-        -------
-        accuracy : a list of the test set accuracies of the different
-        generations.
+    Returns
+    -------
+    accuracy : a list of the test set accuracies of the different
+    generations.
     """
     accuracy = []
 

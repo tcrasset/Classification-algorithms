@@ -21,16 +21,16 @@ def compute_accuracy(nb_gen, nb_neighbors, nb_points):
     for the KNeighborsClassifier class from sklearn.neighbors with a
     particular number of nearest neighbors.
 
-        Parameters
-        ----------
-        -   nb_gen : number of generations of the dataset.
-        -   nb_neighbors : number of nearest neighbors for the KNN model.
-        -   nb_points : number of samples.
+    Parameters
+    ----------
+    -   nb_gen : number of generations of the dataset.
+    -   nb_neighbors : number of nearest neighbors for the KNN model.
+    -   nb_points : number of samples.
 
-        Returns
-        -------
-        accuracy : a list of the test set accuracies of the different
-        generations.
+    Returns
+    -------
+    accuracy : a list of the test set accuracies of the different
+    generations.
     """
     accuracy = []
 
@@ -52,18 +52,18 @@ def compute_cross_val(cv_val, neighbors, nb_points):
     """Computes the optimal value of n_neighbors using a ten-fold cross
     validation strategy.
 
-        Parameters
-        ----------
-        -   cv_val : number of subsamples in the cross validation.
-        -   neighbors : list containing different values for the number
-        of nearest neighbors for the KNN model.
-        -   nb_points : number of samples.
+    Parameters
+    ----------
+    -   cv_val : number of subsamples in the cross validation.
+    -   neighbors : list containing different values for the number
+    of nearest neighbors for the KNN model.
+    -   nb_points : number of samples.
 
-        Returns
-        -------
-        -   optimal_nb : the optimal number of nearest neighbors to consider.
-        -   MSE : a list of the misclassification errors.
-        generations.
+    Returns
+    -------
+    -   optimal_nb : the optimal number of nearest neighbors to consider.
+    -   MSE : a list of the misclassification errors.
+    generations.
     """
     cv_results = []
 
