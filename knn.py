@@ -21,22 +21,21 @@ from plot import plot_boundary
 # ...
 
 def trainEstimator(nbGen, neighbors):
+    accuracy_arr = []
     for generation in range(nbGen):
         nbPoints = 1500
         seed = generation
         X, y = make_dataset2(nbPoints, seed)
-        accuracy_arr = np.zeros(nbGen)
-
         X_ls, X_ts, y_ls, y_ts = train_test_split(X, y, train_size = 1200, test_size = 300)
 
         estimator = KNeighborsClassifier(n_neighbors = neighbors).fit(X_ls,y_ls)
 
         y_pred = estimator.predict(X_ts)
+        accuracy_arr.append(accuracy_score(y_ts, y_pred))
 
         if generation == 1:
             plot_boundary("KNN neighbors {}".format(neighbors),estimator , X_ts, y_ts, 0.1)
         
-        accuracy_arr[generation] = accuracy_score(y_ts, y_pred)
     return accuracy_arr
 
 
@@ -63,7 +62,7 @@ if __name__ == "__main__":
     for neighbor in neighbors:
         print("N_neighbors depth : {}".format(neighbor))
         print("Mean \t STD")
-        accuracy = trainEstimator(5, neighbor)
+        accuracy = np.array(trainEstimator(nbGen, neighbor))
         print("{:.3f} \t {:.4f}".format(accuracy.mean(), accuracy.std()))
 
     cv_results = crossval(neighbors, 10) # Cross-validation testing
@@ -72,11 +71,11 @@ if __name__ == "__main__":
     MSE = [1 - x for x in cv_results]
 
     # determining best k
-    optimal_k = k_list[MSE.index(min(MSE))]
+    optimal_k = neighbors[MSE.index(min(MSE))]
     print("The optimal number of neighbors is {}".format(optimal_k))
 
     # plot misclassification error vs k
-    plt.plot(k_list, MSE)
+    plt.plot(neighbors, MSE)
     plt.xlabel('Number of Neighbors K')
     plt.ylabel('Misclassification Error')
     plt.show()
