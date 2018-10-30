@@ -40,22 +40,24 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
         if y.shape[0] != X.shape[0]:
             raise ValueError("The number of samples differs between X and y")
 
-        #Probability of belonging to given class
-
+        # Probability of belonging to given class
         # Shape :
-        # pi = {class1 : probability,
+        # self.pi_ = {class1 : probability,
         #       class2 : probability,
         #        ...
         #      }
-        pi = {}
+        self.pi_ = {}
 
         # Elementwise mean of attributes per class 
         # Shape :
-        # mu = {class1 : [mean of attributes],
+        # self.mu_ = {class1 : [mean of attributes],
         #       class2 : [mean of attributes],
         #        ...
         #      }
-        mu = {}
+        self.mu_ = {}
+        
+        # Covariance matrix
+        self.Sigma_ = None
 
         # Stores for each class k a tuple 
         # (nb_occurance of class k, list of all samples belonging to k)
@@ -66,8 +68,6 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
         #               }
         dictionary = {}
 
-        X_normlist = []
-        Sigma = None
 
         #Separating the points into their class
         for _X, _y in zip(X,y):
@@ -77,44 +77,44 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
             else:
                 dictionary[_y] = [1, [_X] ]
 
-        #Computing pi and mu
+        # Getting all the unique classes
+        self.classes_ = dictionary.keys()
+        
+        #Computing self.pi_ and self.mu_
+        X_normlist = []
         for key, value in zip(dictionary.keys(), dictionary.values()):
             attributes_array = np.array(value[1])
-            mu[key] = np.mean(attributes_array,axis=0) # Elementwise mean of attributes per class
-            pi[key] = value[0]/y.shape[0] # Probability of belonging to class
+            self.mu_[key] = np.mean(attributes_array,axis=0) # Elementwise mean of attributes per class
+            self.pi_[key] = value[0]/y.shape[0] # Probability of belonging to class
             #Normalize attributes with the mean of their class
-            X_normlist.append(attributes_array - mu[key])
+            X_normlist.append(attributes_array - self.mu_[key])
 
         #Concatenating all the points into one array again
         X_norm = np.concatenate([xnorm for xnorm in X_normlist], axis=0) 
 
         #Covariance matrix
-        Sigma = np.cov(X_norm, rowvar=False)
+        self.Sigma_ = np.cov(X_norm, rowvar=False)
 
-        #Computing probability a posteriori of _x belonging to class _y
-        for _x, _y in zip(X,y):
-            print(self.probpost(_x, _y, Sigma, pi, mu))
-            
         return self
 
-    def ldafunction(self, x, Sigma, mu_k):
+    def _classDensityFunction(self, x, mu_k):
         """ 
         Computes the class density function
         """
-        constant = 1/(2*math.pi**(x.shape[0]/2)*np.sqrt(np.linalg.det(Sigma)))
+        constant = 1/(2*math.pi**(x.shape[0]/2)*np.sqrt(np.linalg.det(self.Sigma_)))
         xnorm = x - mu_k
-        exposant = math.exp(-0.5 * np.transpose(xnorm)@np.linalg.inv(Sigma)@xnorm)
+        exposant = math.exp(-0.5 * np.transpose(xnorm)@np.linalg.inv(self.Sigma_)@xnorm)
         return constant*exposant
 
-    def probpost(self, x, k, Sigma, pi, mu):
+    def _probpost(self, x, k):
         """ 
         Computes the probability a posteriori of x belonging
         to class k
         """
         summation = 0
-        for key in mu.keys():
-            summation += self.ldafunction(x, Sigma, mu[key]) * pi[key]
-        return self.ldafunction(x, Sigma, mu[k]) * pi[k] / summation
+        for key in self.mu_.keys():
+            summation += self._classDensityFunction(x, self.mu_[key]) * self.pi_[key]
+        return self._classDensityFunction(x, self.mu_[k]) * self.pi_[k] / summation
 
     def predict(self, X):
         """Predict class for X.
@@ -130,11 +130,19 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
             The predicted classes, or the predict values.
         """
 
-        # ====================
-        # TODO your code here.
-        # ====================
+        try:
+            getattr(self, "Sigma_")
+        except AttributeError:
+            raise RuntimeError("You must train classifer before predicting data!")
 
-        pass
+        y = np.empty(X.shape[0])
+        indices = np.empty(X.shape[0],dtype=np.int64)
+        p = self.predict_proba(X)
+        np.argmax(p, axis=1, out=indices)
+        classes = sorted(self.classes_)
+
+        y = [classes[i] for i in indices]
+        return y
 
     def predict_proba(self, X):
         """Return probability estimates for the test data X.
@@ -151,14 +159,21 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
             by lexicographic order.
         """
 
-        # ====================
-        # TODO your code here.
-        # ====================
+        #Computing probability a posteriori of X belonging to a certain class
+        classes = sorted(self.classes_)
+        p = []
+        for x in X:
+            for k in classes:
+                p.append(self._probpost(x, k))
 
-        pass
+        p = np.array(p).reshape((X.shape[0],len(classes)))
+        return p
 
 if __name__ == "__main__":
     from data import make_dataset1
     from plot import plot_boundary
     X, y = make_dataset1(1500,666)
-    LinearDiscriminantAnalysis().fit(X, y)
+    estimator = LinearDiscriminantAnalysis().fit(X, y)
+
+    y_pred = estimator.predict(X)
+    print(y)
