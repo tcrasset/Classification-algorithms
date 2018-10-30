@@ -7,7 +7,7 @@ Project 1 - Classification algorithms
 # -*- coding: utf-8 -*-
 
 import numpy as np
-
+import math
 from sklearn.base import BaseEstimator, ClassifierMixin
 
 
@@ -60,7 +60,6 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
         X_norm = []
         Sigma = None
 
-        dictionary = {}
         # Stores for each class k a tuple 
         # (nb_occurance of class k, list of all samples belonging to k)
         # dictionnary[k][0] =  nb_occurance
@@ -91,13 +90,30 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
         #Covariance matrix
         Sigma = np.cov(X_norm, rowvar=False)
 
-        const = 1/(2*math.pi**(X.shape[1]/2)*np.sqrt(np.abs(Sigma)))
+        #Computing probability a posteriori of _x belonging to class _y
         for _x, _y in zip(X,y):
-            _xnorm = _x - mu[_y]
-            exposant = math.exp(-0.5 * np.transpose(_xnorm)@np.linalg.inv(Sigma)@_xnorm)
-            function = const*exposant
+            print(self.probpost(_x, _y, Sigma, pi, mu))
             
         return self
+
+    def ldafunction(self, x, Sigma, mu_k):
+        """ 
+        Computes the class density function
+        """
+        constant = 1/(2*math.pi**(x.shape[0]/2)*np.sqrt(np.linalg.det(Sigma)))
+        xnorm = x - mu_k
+        exposant = math.exp(-0.5 * np.transpose(xnorm)@np.linalg.inv(Sigma)@xnorm)
+        return constant*exposant
+
+    def probpost(self, x, k, Sigma, pi, mu):
+        """ 
+        Computes the probability a posteriori of x belonging
+        to class k
+        """
+        summation = 0
+        for key in mu.keys():
+            summation += self.ldafunction(x, Sigma, mu[key]) * pi[key]
+        return self.ldafunction(x, Sigma, mu[k]) * pi[k] / summation
 
     def predict(self, X):
         """Predict class for X.
@@ -143,3 +159,5 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
 if __name__ == "__main__":
     from data import make_dataset1
     from plot import plot_boundary
+    X, y = make_dataset1(1500,666)
+    LinearDiscriminantAnalysis().fit(X, y)
