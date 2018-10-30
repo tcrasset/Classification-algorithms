@@ -78,13 +78,15 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
 
         # Getting all the unique classes
         self.classes_ = dictionary.keys()
-        
+
         #Computing self.pi_ and self.mu_
         X_normlist = []
         for key, value in zip(dictionary.keys(), dictionary.values()):
             attributes_array = np.array(value[1])
-            self.mu_[key] = np.mean(attributes_array,axis=0) # Elementwise mean of attributes per class
-            self.pi_[key] = value[0]/y.shape[0] # Probability of belonging to class
+            # Elementwise mean of attributes per class
+            self.mu_[key] = np.mean(attributes_array,axis=0) 
+            # Probability of belonging to class
+            self.pi_[key] = value[0]/y.shape[0] 
             #Normalize attributes with the mean of their class
             X_normlist.append(attributes_array - self.mu_[key])
 
@@ -127,7 +129,7 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
         The probability a posteriori of x belonging to class k.
         """
         summation = 0
-        for key in self.mu_.keys():
+        for key in self.classes_:
             summation += self._classDensityFunction(x, self.mu_[key]) * self.pi_[key]
         return self._classDensityFunction(x, self.mu_[k]) * self.pi_[k] / summation
 
