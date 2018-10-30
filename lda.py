@@ -9,6 +9,9 @@ Project 1 - Classification algorithms
 import numpy as np
 import math
 from sklearn.base import BaseEstimator, ClassifierMixin
+from sklearn.model_selection import train_test_split, cross_val_score
+from sklearn.metrics import accuracy_score
+from plot import plot_boundary
 
 
 
@@ -156,8 +159,26 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
 
         pass
 
+    def trainEstimator(nbGen, dataset):
+        accuracy_array = []
+        nbPoints = 1500
+
+        for gen in range(nbGen):
+            seed = gen
+
+            X_ls, X_ts, y_ls, y_ts = train_test_split(X, y, train_size = 0.8, test_size = 0.2)
+
+            estimator = LinearDiscriminantAnalysis().fit(X_ls, y_ls)
+            y_pred = estimator.predict(X_ts)
+
+
 if __name__ == "__main__":
     from data import make_dataset1
     from plot import plot_boundary
+
+
+
     X, y = make_dataset1(1500,666)
-    LinearDiscriminantAnalysis().fit(X, y)
+   
+
+    
