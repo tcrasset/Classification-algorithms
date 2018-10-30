@@ -40,7 +40,19 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
         if y.shape[0] != X.shape[0]:
             raise ValueError("The number of samples differs between X and y")
 
+        # Elementwise mean of attributes per class 
+        # Shape :
+        # pi = [[key, probability],
+        #       [key, probability],
+        #        ...
+        #      ]
         pi = []
+        #Probability of belonging to given class
+        # Shape :
+        # mu = [[key, [mean of attributes]],
+        #       [key, [mean of attributes]],
+        #        ...
+        #      ]
         mu = []
         X_norm = []
         Sigma = None
@@ -60,16 +72,17 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
 
         for key, value in zip(dictionary.keys(), dictionary.values()):
             attributes_array = np.array(value[1])
-            mu.append([key, np.mean(attributes_array,axis=0)]) # Elementwise mean of attributes per class
-            pi.append([key, value[0]/y.shape[0]]) # Probability of belonging to class
+            mu.append([key, np.mean(attributes_array,axis=0)])
+            pi.append([key, value[0]/y.shape[0]])
             #Normalize attributes with the mean of their class
             X_norm.append(attributes_array - mu[-1][1])
 
-        #Concatenatinng all the points into one array again
+        #Concatenating all the points into one array again
         X_norm[1] = np.array(X_norm[1])
         X_norm[0] = np.array(X_norm[0])
         X_norm = np.concatenate((X_norm[0], X_norm[1]), axis=0)
 
+        #Covariance matrix
         Sigma = np.cov(X_norm, rowvar=False)
 
         return self
@@ -116,5 +129,5 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
         pass
 
 if __name__ == "__main__":
-    from data import make_data
+    from data import make_dataset1
     from plot import plot_boundary
