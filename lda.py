@@ -7,7 +7,7 @@ Project 1 - Classification algorithms
 # -*- coding: utf-8 -*-
 
 import numpy as np
-
+import math
 from sklearn.base import BaseEstimator, ClassifierMixin
 
 
@@ -60,7 +60,6 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
         X_norm = []
         Sigma = None
 
-        dictionary = {}
         # Stores for each class k a tuple 
         # (nb_occurance of class k, list of all samples belonging to k)
         # dictionnary[k][0] =  nb_occurance
