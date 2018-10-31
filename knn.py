@@ -37,7 +37,7 @@ def compute_accuracy(nb_gen, nb_neighbors, nb_points):
     for generation in range(nb_gen):
 
         X, y = make_dataset2(nb_points, generation)
-        X_ls, X_ts, y_ls, y_ts = train_test_split(X, y, train_size=.8)
+        X_ls, X_ts, y_ls, y_ts = train_test_split(X, y, train_size=.8, test_size=.2)
 
         estimator = KNeighborsClassifier(n_neighbors = nb_neighbors).fit(X_ls, y_ls)
         y_pred = estimator.predict(X_ts)
