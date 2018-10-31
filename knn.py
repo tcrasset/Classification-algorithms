@@ -100,4 +100,5 @@ if __name__ == "__main__":
     plt.plot(neighbors, MSE)
     plt.xlabel('Number of Neighbors K')
     plt.ylabel('Misclassification Error')
-    plt.show()
+    # plt.savefig("MSE.pdf")
+    # plt.show()
