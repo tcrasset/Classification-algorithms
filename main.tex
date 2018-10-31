@@ -141,17 +141,21 @@
 \caption{ \label{fig:maxdepth} Decision boundary for a \texttt{max\_depth} value of (\subref{fig:1a}) 1, (\subref{fig:1b}) 2, (\subref{fig:1c}) 4, (\subref{fig:1d}) 8 and (\subref{fig:1e}) None. The points are intentionally left out of the first 4 figures to the decision boundary}
 \end{figure}
 
-As can be seen on Figure \ref{fig:maxdepth}, a \texttt{max\_depth} value of 1 (Figure \ref{fig:1a} splits the state space in two, placing the decision boundary horizontally in the middle of the set. The model doesn't properly fit the data at all and is clearly underfitting. The ellipsoid shape of the blue data points isn't detected at all, neither is the circular shape of the red ones.
-Increasing the depth further to 2 introduces a linear separation, this time vertically to select a majority of blue points. 
-As the depth even further increases, more and more linear separation will take place and thus creating rectangular surfaces all around the data points, sometimes trying to fit lonely data points inside another dense pocket of other coloured points, such as in Figure \ref{fig:1d} or Figure \ref{fig:1e} with a maxdepth of 8 or no constraint on the maximal depth. These clearly overfit the data, sometimes creating surfaces which don't even include a single data points they are trying to classify.
+As can be seen on Figure \ref{fig:maxdepth}, a \texttt{max\_depth} value of 1 splits the state space in two, placing the decision boundary horizontally in the middle of the set. The model doesn't properly fit the data at all and is clearly underfitting. The ellipsoid shape of the blue data points isn't detected at all, neither is the circular shape of the red ones.
+
+Increasing the depth further to 2 introduces a linear separation, this time vertically, to select a majority of blue points.
+
+As the depth even further increases, more and more linear separations will take place and thus will create rectangular surfaces all around the data points, sometimes trying to fit lonely data points inside another dense pocket of other coloured points, such as in Figure \ref{fig:1d} or Figure \ref{fig:1e} with a maxdepth of 8 or no constraint on the maximal depth. These clearly overfit the data, sometimes creating surfaces which don't even include a single data points they are trying to classify.
 
 A maximal depth of 4 seems to be the ideal compromise for such a decision tree classifier as it captures the majority of the points without trying to contort itself around lonely data points and thereby skewing the accuracy.
 
-The claim that the model seems to be more confident with an unconstrained maximal depth contradicts the results that came out of the testing. Indeed, the accuracy worsened as well as the variance on all the generations.
+The claim that the model seems to be more confident with an unconstrained maximal depth contradicts the results that came out of the testing. Indeed, the accuracy worsened as well as the variance on all the generations as can be seen on Table \ref{tab:mean_dt} in the following point.
 
 \subsection{Average test set accuracies}
 
-\begin{table}[h!]
+The Table \ref{tab:mean_dt} reports the average test set accuracies over five generations of the dataset 2 along with the standard deviation for each depth. It confirms what was previously said : with a maxdepth of 1, the model is clearly underfitting whereas it is clearly overfitting with no constraint on the depth. The maximal depth of 4 seems to be the ideal one with the best average accuracy and the lowest standard deviation over the five data generations.
+
+\begin{table}[H]
     \centering
     \begin{tabular}{|c|c|c|c|c|c|}
   \hline
@@ -166,7 +170,6 @@ The claim that the model seems to be more confident with an unconstrained maxima
     \label{tab:mean_dt}
 \end{table}
 
-The Table \ref{tab:mean_dt} reports the average test set accuracies over five generations of the dataset 2 along with the standard deviation for each depth.
 
 \section{K-nearest neighbours}
 
@@ -212,14 +215,26 @@ The points are intentionally left out of the first 5 figures to show more detail
 \end{figure}
 
 
-The Figure \ref{fig:nneighbors} shows the different decision boundaries for varying values of \texttt{n\_neighbors}. As one can see, with a value of 1 neighbor, the model clearly underfits the data, coloring regions on the upper portion of the graph in red, even though red points are nowhere near that region. As the number of neighbors increases, the model grows more confident and is able to better map the regions. Whereas there is still a faint red color on the upper portion of the graph for a value of 5, in the subsequent graphs for higher values, this region is blue again.
-However, once a number of neighbours of 625 is used, the regions mapped start to become to broad and begin to fade into each other. This is because the total training set has only 1200  samples and with this number being more than half of the points, the closest points encompass a large amount of the dataset. It is clearly overfitting.
-As a number of 1200 is reached, the whole figure is colored a faint blue and that is understandable. In fact, it is to be expected because all the points are used to classify the points and it just so happens that the blue points won over the red ones, but it could have been reversed. The reason might be the disposition of the blue points, they are more spread apart than the red one and thus cover a bigger region of the plane.
+The Figure \ref{fig:nneighbors} shows the different decision boundaries for varying values of \texttt{n\_neighbours}. As one can see, with a value of 1 neighbour, the model clearly underfits the data, coloring regions on the upper portion of the graph in red, even though red points are nowhere near that region. As the number of neighbours increases, the model grows more confident and is able to better map the regions. Whereas there is still a faint red color on the upper portion of the graph for a value of 5, in the subsequent graphs for higher values, this region is blue again.
+
+However, once a number of neighbours of 625 is used, the regions mapped start to become too broad and begin to fade into each other. This is because the total training set has only 1200  samples and with 625 being more than half of the points, the closest points encompass a large amount of the dataset. It is clearly overfitting.
+
+As a number of 1200 is reached, the whole figure is colored a faint blue and that is understandable. In fact, it is to be expected because all the points are used to classify the points and it just so happens that the blue points won over the red ones, but it could have been reversed. The reason might be the disposition of the blue points, they are more spread apart than the red ones and thus cover a bigger region of the plane.
 ~
 ~
 ~
 ~
 \subsection{Optimisation with a ten-fold cross validation strategy}
+
+Our methodology for the 10-fold cross-validation testing is pretty straight forward. K-fold cross validation consists in separating the dataset into K sections, training on a subset of them and testing on the rest of the subset. To reduce variability, multiple rounds of cross-validation are performed using different partitions, and the validation results are averaged over the rounds to give an estimate of the model’s predictive performance. 
+
+In Python, a simple method for doing this is the \texttt{cross\_val\_score()} method.
+This is repeated for varying values of \texttt{n\_neighbours} to find the optimal value, that is the value that has the lowest misclassification error.
+
+
+As expected, the optimal number of neighbours is 125. This confirms the trend that is shown on Figure \ref{fig:nneighbors}. Indeed, the number 125 is neither too high nor too low to accurately classify the points in the space. 125 is more or less 10\% of the size of the training set used.
+
+Additionally, the misclassification error has been plotted for the different values of \texttt{n\_neighbours} on Figure \ref{fig:MSE} and it shows that 125 has the lowest error value and that for 1200 , the error is nearly 50\%, which is equivalent to flipping a coin.
 
 \begin{figure}[H]
     \centering
@@ -227,13 +242,6 @@ As a number of 1200 is reached, the whole figure is colored a faint blue and tha
     \caption{Misclassification error for multiple values of \texttt{n\_neighbours}}
     \label{fig:MSE}
 \end{figure}
-
-
-Our methodology for the 10-fold cross-validation testing is pretty straight forward. K-fold cross validation consist in separating the dataset into K sections, training on a subset of them and testing on the rest of the subset. To reduce variability, multiple rounds of cross-validation are performed using different partitions, and the validation results are averaged over the rounds to give an estimate of the model’s predictive performance. This is repeated for varying values of \texttt{n\_neighbors} to find the optimal value, that is the value that has the lowest misclassification error.
-In Python, a simple method for doing this is the \texttt{cross\_val\_score()} method.
-
-As expected, the optimal number of neighbors is 125. This confirms the trend that is shown on Figure \ref{fig:nneighbors}. Indeed, the number 125 is neither to high nor too low to accurately classify the points in the space. 125 is more or less 10\% of the size of the training set used.
-Additionally, the misclassification error has been plotted for the different values of \texttt{n\_neighbors} on Figure \ref{fig:MSE} and it shows that 125 has the lowest error value and that for 1200 , the error is nearly 50\%, which is equivalent to flipping a coin.
 
 
 \section{Linear discriminant analysis}
@@ -273,7 +281,7 @@ If we divide $R^p$ into regions that are classified as class 1, class 2, etc., t
 The Figure \ref{fig:LDA} shows that the decision boundary separates the blunt of the two classes quite well, especially for the first data set. 
 
 \subsection{Average test accuracies}
-\begin{table}[h!]
+\begin{table}[H]
     \centering
     \begin{tabular}{|c|c|c|}
   \hline
@@ -289,10 +297,12 @@ The Figure \ref{fig:LDA} shows that the decision boundary separates the blunt of
 \end{table}
 
 The Table \ref{tab:mean_lda} reports the average test set accuracies over five generations of the dataset 1 and 2 along with the standard deviation.
-The average accuracy for dataset1 is higher and the Figure \ref{fig:LDA} shows why: in the first dataset, the data clouds of the two classes have the same orientation and the same shape, whereas in the second one, the red class has a more circular shape.
+The average accuracy for dataset 1 is higher and the Figure \ref{fig:LDA} shows why: in the first dataset, the data clouds of the two classes have the same orientation and the same shape, whereas in the second one, the red class has a more circular shape.
 Another thing to note is that the standard deviation is very small for both datasets.
+
+
 \subsection{Similarities and divergences between datasets}
-As briefly commented in the previous point, the shape of the red points cloud differ from one dataset to the other. 
-The fact that the Linear discriminant analysis classifier gives better results for the first dataset is because the hypothesis of homoscedasticity holds true. Indeed, the covariance matrix describes the overall shape of the points in that class and in the case of dataset 1, their covariance matrix are indeed the same, so the hypothesis is satisfied. In dataset 2 however, as the Figure \ref{fig:LDA2} shows, the red class has a more circular shape and thus the covariance matrix between the two classes is not the same, the hypothesis is not true and thus the accuracy of the prediction suffers.
+As briefly commented in the previous point, the shape of the red points could differ from one dataset to the other. 
+The fact that the linear discriminant analysis classifier gives better results for the first dataset is because the hypothesis of homoscedasticity holds true. Indeed, the covariance matrix describes the overall shape of the points in a given class and in the case of the dataset 1, the covariance matrices of both classes are indeed the same, so the hypothesis is satisfied. In dataset 2 however, as the Figure \ref{fig:LDA2} shows, the red class has a more circular shape and thus the covariance matrix between the two classes is not the same, the hypothesis is not true and thus the accuracy of the prediction suffers.
 
 \end{document}
