@@ -183,7 +183,7 @@ class LinearDiscriminantAnalysis(BaseEstimator, ClassifierMixin):
 
         return np.array(p).reshape((X.shape[0],len(classes)))
 
-def compute_accuracy(nbPoints, nbGen):
+def compute_accuracy(nbPoints, nbGen, dataset="dataset1"):
     """Computes the test set accuracies over nbGen generations of the dataset
         using a LinearDiscriminantAnalysis() as a classifier
 
@@ -200,22 +200,27 @@ def compute_accuracy(nbPoints, nbGen):
 
     for gen in range(nbGen):
 
-        X, y = make_dataset1(nbPoints, gen)
+        if dataset=="dataset2":
+            X, y = make_dataset2(nbPoints, gen)
+        else:
+            X, y = make_dataset1(nbPoints, gen)
         X_ls, X_ts, y_ls, y_ts = train_test_split(X, y, train_size = 0.8, test_size=0.2)
 
         estimator = LinearDiscriminantAnalysis().fit(X_ls, y_ls)
         accuracy.append(estimator.score(X_ts, y_ts))
 
-    return np.array(accuracy).mean()
+    return np.array(accuracy)
 
 
 if __name__ == "__main__":
-    from data import make_dataset1
+    from data import make_dataset1, make_dataset2
     from plot import plot_boundary
     from sklearn.model_selection import train_test_split
 
     nbPoints = 1500
     nbGen = 5
 
-    accuracy = compute_accuracy(nbPoints, nbGen)
-    print(accuracy)
+    accuracy = compute_accuracy(nbPoints, nbGen,"dataset1")
+    print("Dataset 1   Mean: {:.3f} STD: {:.4f}".format(accuracy.mean(), accuracy.std()))
+    accuracy = compute_accuracy(nbPoints, nbGen,"dataset2")
+    print("Dataset 2   Mean: {:.3f} STD: {:.4f}".format(accuracy.mean(), accuracy.std()))
