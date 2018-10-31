@@ -47,7 +47,7 @@ def compute_accuracy(nb_gen, max_depth, nb_points):
         accuracy.append(accuracy_score(y_ts, y_pred))
 
         if generation == 1:
-            plot_boundary("DT max_depth {}".format(max_depth), estimator, X_ts, y_ts, 0.1)
+            plot_boundary("DT maxdepth {}".format(max_depth), estimator, X_ts, y_ts, 0.1)
 
     return np.array(accuracy)
 
